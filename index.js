@@ -123,11 +123,27 @@ app.get('/article-meta', async (req, res) => {
       });
     }
 
+    let referer = 'https://www.wineenthusiast.com/';
+    try {
+      const host = new URL(pageUrl).hostname.toLowerCase();
+      if (host.includes('wineenthusiast.com')) {
+        referer = 'https://www.wineenthusiast.com/';
+      } else {
+        referer = `https://${host}/`;
+      }
+    } catch {
+      /* default referer */
+    }
+
     const response = await fetch(pageUrl, {
       headers: {
         'User-Agent': ARTICLE_FETCH_UA,
         Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
+        Referer: referer,
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
       },
       redirect: 'follow',
       signal: AbortSignal.timeout(15000),
